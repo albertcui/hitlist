@@ -3,12 +3,20 @@
   "version": "1.0.0",
   "description": "Application to help track and complete your Steam games.",
   "main": "web.js",
+  "repository": "https://github.com/albertcui/hitlist",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Albert Cui",
   "license": "GPLv3",
   "dependencies": {
-    "express": "^4.13.0"
+    "big-number": "^0.3.1",
+    "express": "^4.13.0",
+    "passport": "^0.2.2",
+    "passport-steam": "^0.1.5",
+    "pg": "^4.4.0",
+    "pg-hstore": "^2.3.2",
+    "request": "^2.58.0",
+    "sequelize": "^3.3.2"
   }
 }
