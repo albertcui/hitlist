@@ -14,7 +14,11 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-    db.User.findById(id)
+    db.models.User.findOne({
+        where: {
+            steamID: id
+        }
+    })
     .then(function(user) {
         done(null, user);
     })
@@ -40,12 +44,10 @@ passport.use(new SteamStrategy({
         avatar: profile._json.avatar,
         avatarMedium: profile._json.avatarmedium,
         avatarFull: profile._json.avatarfull,
-        steamUserSince: profile._json.timecreated,
+        steamUserSince: profile._json.timecreated * 1000,
         HLJoinDate: new Date()
     };
-    
-    console.log(profile);
-    console.log(user);
+
     done(null, user);
 }));
 
@@ -56,9 +58,7 @@ app.route('/login').get(passport.authenticate('steam', {
 app.route('/return').get(passport.authenticate('steam', {
     failureRedirect: '/'
 }), function(req, res, next) {
-    console.log("req.user");
-    console.log(req.user);
-    db.User.findOrCreate({
+    db.models.User.findOrCreate({
         where: {
             steamID: req.user.steamID
         },
@@ -68,13 +68,12 @@ app.route('/return').get(passport.authenticate('steam', {
         user.HLLastLoggedIn = new Date();
         user.save();
         
-        res.send(console.log(user));
+        res.redirect("/");
     })
 });
 
 app.route('/logout').get(function(req, res) {
     req.logout();
-    req.session = null;
     res.redirect('/');
 });
 

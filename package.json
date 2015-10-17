@@ -15,12 +15,15 @@
     "dotenv": "^1.2.0",
     "express": "^4.13.0",
     "express-session": "^1.11.3",
+    "hiredis": "^0.4.1",
     "passport": "^0.2.2",
     "passport-steam": "^0.1.5",
     "pg": "^4.4.0",
     "pg-hstore": "^2.3.2",
+    "redis": "^2.2.3",
     "request": "^2.58.0",
-    "sequelize": "^3.3.2"
+    "sequelize": "^3.3.2",
+    "sequelize-singleton": "git+https://github.com/albertcui/sequelize-singleton.git"
   },
   "engines": {
     "node": ">=4.2.1"

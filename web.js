@@ -20,6 +20,13 @@ app.use(login.passport.session());
 
 app.use("/", login.routes);
 
+app.get("/", function(req, res) {
+    if (req.user) {
+        res.send(JSON.stringify(req.user))
+    } else {
+        res.send("<a href='/login'>login</a>");
+    }
+})
 app.listen(3001, function() {
      console.log("[WEB] listening on 3000");
 });
