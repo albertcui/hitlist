@@ -28,13 +28,13 @@ Information returned by Passport
 */
 module.exports = function(sequelize, type) {
     var User = sequelize.define("User", {
-        steamID: type.BIGINT,
-        profileName: type.STRING,
-        profileURL: type.STRING,
+        steamid: type.BIGINT,
+        personaname: type.STRING,
+        profileurl: type.STRING,
         avatar: type.STRING,
-        avatarMedium: type.STRING,
-        avatarFull: type.STRING,
-        steamUserSince: type.DATE,
+        avatarmedium: type.STRING,
+        avatarfull: type.STRING,
+        timecreated: type.DATE, // The Steam account creation date
         HLJoinDate: type.DATE,
         HLLastLoggedIn: type.DATE,
         HLLastVisited: type.DATE,
@@ -48,7 +48,7 @@ module.exports = function(sequelize, type) {
         indexes: [
             {
                 unique: true,
-                fields: ['steamID']
+                fields: ['steamid']
             }
         ]
     });

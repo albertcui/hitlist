@@ -8,7 +8,9 @@ var defaults = {
     "DATABASE_URL": "",
     "STEAM_API_KEY": "", //for API reqs, in worker
     "ROOT_URL": "http://localhost:3001",
-    "SESSION_SECRET": "keyboard cat"
+    "SESSION_SECRET": "keyboard cat",
+    "REDIS_HOST": "127.0.0.1",
+    "REDIS_PORT": "6379"
 };
 
 for (var key in defaults) {

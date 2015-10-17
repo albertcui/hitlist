@@ -8,18 +8,22 @@ var db = require('../db');
 var config = require('../config');
 var apiKey = config.STEAM_API_KEY;
 var host = config.ROOT_URL;
+var apiQueue = require("../queues").apiQueue;
 
 passport.serializeUser(function(user, done) {
-    done(null, user.steamID);
+    done(null, user.steamid);
 });
 
 passport.deserializeUser(function(id, done) {
     db.models.User.findOne({
         where: {
-            steamID: id
+            steamid: id
         }
     })
     .then(function(user) {
+        if (!user) return done(null, null);
+        user.HLLastVisited = new Date();
+        user.save();
         done(null, user);
     })
     .catch(function(err) {
@@ -37,17 +41,10 @@ passport.use(new SteamStrategy({
         return done("No profile.", null);
     }
     
-    var user = {
-        steamID: profile._json.steamid,
-        profileName: profile._json.personaname,
-        profileURL: profile._json.profileurl,
-        avatar: profile._json.avatar,
-        avatarMedium: profile._json.avatarmedium,
-        avatarFull: profile._json.avatarfull,
-        steamUserSince: profile._json.timecreated * 1000,
-        HLJoinDate: new Date()
-    };
-
+    var user = profile._json;
+    user.timecreated = user.timecreated * 1000 || null;
+    user.HLJoinDate = new Date();
+    console.log(user);
     done(null, user);
 }));
 
@@ -60,14 +57,24 @@ app.route('/return').get(passport.authenticate('steam', {
 }), function(req, res, next) {
     db.models.User.findOrCreate({
         where: {
-            steamID: req.user.steamID
+            steamid: req.user.steamid
         },
         defaults: req.user
     })
     .spread(function(user, created) {
         user.HLLastLoggedIn = new Date();
         user.save();
-        
+        apiQueue.add({
+            call: "getOwnedGames",
+            args: {
+                steamid: user.steamid,
+                include_appinfo: true,
+                include_played_free_games: true,
+                appids_filter: false
+            },
+            userID: user.id
+        })
+
         res.redirect("/");
     })
 });

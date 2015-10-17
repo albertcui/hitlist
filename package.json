@@ -5,12 +5,15 @@
   "main": "web.js",
   "repository": "https://github.com/albertcui/hitlist",
   "scripts": {
+    "dev": "nf -wj Procfile.dev start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Albert Cui",
   "license": "GPLv3",
   "dependencies": {
     "big-number": "^0.3.1",
+    "bluebird": "^2.10.2",
+    "bull": "^0.6.0",
     "connect-redis": "^3.0.1",
     "dotenv": "^1.2.0",
     "express": "^4.13.0",
@@ -23,9 +26,13 @@
     "redis": "^2.2.3",
     "request": "^2.58.0",
     "sequelize": "^3.3.2",
-    "sequelize-singleton": "git+https://github.com/albertcui/sequelize-singleton.git"
+    "sequelize-singleton": "git+https://github.com/albertcui/sequelize-singleton.git",
+    "steam-webapi": "^0.6.5"
   },
   "engines": {
     "node": ">=4.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.7.1"
   }
 }

@@ -4,6 +4,6 @@ var orm = require('sequelize-singleton'),
 orm.discover = [__dirname + "/models"];
 orm.connect(config.DATABASE_URL);
 
-orm.sequelize.sync();
+orm.sequelize.sync(); //({force: true});
 
 module.exports = orm;

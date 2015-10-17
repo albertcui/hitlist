@@ -1,10 +1,10 @@
 module.exports = function(sequelize, type) {
     var Game =  sequelize.define("Game", {
         name: type.STRING,
-        appID: type.INTEGER,
-        imgIconURL: type.STRING,
-        imgLogoURL: type.STRING,
-        hasCommunityAvailableStats: type.BOOLEAN
+        appid: type.INTEGER,
+        img_icon_url: type.STRING,
+        img_logo_url: type.STRING,
+        has_community_visible_stats:type.BOOLEAN
     }, {
         classMethods: {
             associate : function(models) {
@@ -14,7 +14,7 @@ module.exports = function(sequelize, type) {
         indexes: [
             {
                 unique: true,
-                fields: ['appID']
+                fields: ['appid']
             }
         ]
     });
