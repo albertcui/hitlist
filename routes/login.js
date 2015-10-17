@@ -27,7 +27,7 @@ passport.deserializeUser(function(id, done) {
         done(null, user);
     })
     .catch(function(err) {
-        done(err, null);
+        done(err);
     });
 });
 
@@ -76,6 +76,9 @@ app.route('/return').get(passport.authenticate('steam', {
         })
 
         res.redirect("/");
+    })
+    .cache(function(err) {
+        next(err);
     })
 });
 

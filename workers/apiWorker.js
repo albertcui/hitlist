@@ -33,13 +33,21 @@ Steam.ready(function(err) {
 
                         var timePlayed = elem.playtime_forever;
 
-                        db.models.Game.create(elem)
-                        .then(function(game) {
+                        return db.models.Game.findOrCreate({
+                            where: {
+                                appid: elem.appid
+                            },
+                            defaults: elem
+                        })
+                        .spread(function(game, created) {
                             return user.addGame(game, {timePlayed: timePlayed});
                         })
                     })
-                    .then(function(game) {
+                    .then(function() {
                         done();
+                    })
+                    .catch(function(err) {
+                        done(err);
                     })
                     
                 } else {
