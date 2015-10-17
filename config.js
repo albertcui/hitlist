@@ -1,13 +1,19 @@
+try {
+    require('dotenv').load();
+} catch(e) {
+    console.log("[WARNING] error occurred when loading .env: %s", e);
+}
+
 var defaults = {
-    "DATA_BASE_URL": ""
+    "DATABASE_URL": "",
     "STEAM_API_KEY": "", //for API reqs, in worker
-    "ROOT_URL": "http://localhost:5000"
+    "ROOT_URL": "http://localhost:3001",
+    "SESSION_SECRET": "keyboard cat"
 };
 
-//nf puts values in .env into process.env
-//ensure that process.env has all values in defaults, but prefer the process.env value
 for (var key in defaults) {
     process.env[key] = process.env[key] || defaults[key];
 }
+
 //now processes can use either process.env or config
 module.exports = process.env;
