@@ -1,61 +1,55 @@
-var apiQueue = require("../queues").apiQueue;
-var db = require("../db");
-
-var Steam = require("steam-webapi");
 var Promise = require("bluebird");
+var getUserGamesQueue = require("../queues").getUserGamesQueue;
+var db = require("../db");
+var api = require("../utility/api");
 
-Steam.key = require("../config").STEAM_API_KEY;
+getUserGamesQueue.clean(10000, "waiting");
+getUserGamesQueue.clean(10000, "failed");
+getUserGamesQueue.clean(10000, "active");
+getUserGamesQueue.clean(10000, "delayed");
+getUserGamesQueue.clean(10000);
 
-apiQueue.clean(10000, "waiting");
-apiQueue.clean(10000, "failed");
-apiQueue.clean(10000, "active");
-apiQueue.clean(10000, "delayed");
-apiQueue.clean(10000);
-
-apiQueue.on('cleaned', function (job, type) {
+getUserGamesQueue.on('cleaned', function (job, type) {
   console.log('Cleaned %s %s jobs', job.length, type);
 });
 
-Steam.ready(function(err) {
-    if (err) throw err;
+getUserGamesQueue.process(function(job, done) {
+    console.log("processing");
     
-    Promise.promisifyAll(Steam.prototype);
+    var getOwnedGamesArgs = {
+        steamid: job.data.steamid,
+        include_appinfo: true,
+        include_played_free_games: true,
+        appids_filter: false
+    }
     
-    var steam = new Steam()
-    apiQueue.process(function(job, done) {
-        console.log("processing");
-        steam[job.data.call + "Async"](job.data.args)
-        .then(function(data) {
-            db.models.User.findById(job.data.userID)
-            .then(function(user) {
-                if (user) {
-                    Promise.map(data.games, function(elem) {
-
-                        var timePlayed = elem.playtime_forever;
-
-                        return db.models.Game.findOrCreate({
-                            where: {
-                                appid: elem.appid
-                            },
-                            defaults: elem
-                        })
-                        .spread(function(game, created) {
-                            return user.addGame(game, {timePlayed: timePlayed});
-                        })
+    api("getOwnedGames", getOwnedGamesArgs, function(err, data) {
+        if (err) return done(err);
+        
+        db.models.User.findById(job.data.userID)
+        .then(function(user) {
+            if (user) {
+                Promise.map(data.games, function(elem) {
+                    var timePlayed = elem.playtime_forever;
+                    return db.models.Game.findOrCreate({
+                        where: {
+                            appid: elem.appid
+                        },
+                        defaults: elem
                     })
-                    .then(function() {
-                        done();
+                    .spread(function(game, created) {
+                        return user.addGame(game, {timePlayed: timePlayed});
                     })
-                    .catch(function(err) {
-                        done(err);
-                    })
-                    
-                } else {
-                    done("Couldn't find user");
-                }
-                
-            })
+                });
+            } else {
+                throw "Couldn't find user";
+            }
+        })
+        .then(function() {
+            done();
+        })
+        .catch(function(err) {
+            done(err);
         })
     })
-})
-
+});

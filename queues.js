@@ -12,7 +12,5 @@ var Queue = require("bull");
 var config = require("./config");
 
 module.exports = {
-      apiQueue: Queue("api", config.REDIS_PORT, config.REDIS_HOST)
+      getUserGamesQueue: Queue("getUserGamesAPI", config.REDIS_PORT, config.REDIS_HOST)
 }
-
-

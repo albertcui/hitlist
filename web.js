@@ -1,9 +1,11 @@
 var express = require('express'),
+    graphQLHTTP = require('express-graphql'),
     session = require('express-session'),
     RedisStore = require('connect-redis')(session),
-    redis = require("redis"),
+    redis = require('redis'),
     config = require('./config'),
     rClient = redis.createClient({port: config.REDIS_PORT, host: config.REDIS_HOST}),
+    hitlistSchema = require("./models/hitlistSchema"),
     login = require('./routes/login');
     
 var app = express();
@@ -16,8 +18,11 @@ app.use(session({
 }))
 app.use(login.passport.initialize());
 app.use(login.passport.session());
-
 app.use("/", login.routes);
+app.use("/graphql", graphQLHTTP({
+    schema: hitlistSchema,
+    graphiql: true
+}))
 
 app.get("/", function(req, res) {
     if (req.user) {

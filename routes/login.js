@@ -8,7 +8,7 @@ var db = require('../db');
 var config = require('../config');
 var apiKey = config.STEAM_API_KEY;
 var host = config.ROOT_URL;
-var apiQueue = require("../queues").apiQueue;
+var getUserGamesQueue = require("../queues").getUserGamesQueue;
 
 passport.serializeUser(function(user, done) {
     done(null, user.steamid);
@@ -64,20 +64,14 @@ app.route('/return').get(passport.authenticate('steam', {
     .spread(function(user, created) {
         user.HLLastLoggedIn = new Date();
         user.save();
-        apiQueue.add({
-            call: "getOwnedGames",
-            args: {
-                steamid: user.steamid,
-                include_appinfo: true,
-                include_played_free_games: true,
-                appids_filter: false
-            },
+        getUserGamesQueue.add({
+            steamid: user.steamid,
             userID: user.id
         })
 
         res.redirect("/");
     })
-    .cache(function(err) {
+    .catch(function(err) {
         next(err);
     })
 });
